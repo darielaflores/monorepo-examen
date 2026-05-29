@@ -8,7 +8,7 @@ on:
   workflow_dispatch:
     inputs:
       action:
-        description: "Ejecutar self-hosted"
+        description: "Ejecutar self-hosted runner"
         required: true
         default: "self-hosted-job"
         type: choice
