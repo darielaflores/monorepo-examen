@@ -1,0 +1,39 @@
+name: Self-hosted Runner Examen
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+
+  # Self runner
+  self-hosted-job:
+
+    runs-on:
+      - self-hosted
+      - windows
+      - custom-runner
+
+    steps:
+
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Show current user
+        run: whoami
+
+      - name: Show runner info
+        run: |
+          echo "Running on Self Hosted Runner"
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+
+      - name: Install dependencies
+        run: npm install
+
+      - name: Run tests
+        run: npm test
