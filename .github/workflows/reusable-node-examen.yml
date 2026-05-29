@@ -1,0 +1,37 @@
+name: Reusable Node Workflow Examen
+
+on:
+
+  workflow_call:
+
+    inputs:
+
+      working-directory:
+        required: true
+        type: string
+
+jobs:
+
+  node-job:
+
+    runs-on: ubuntu-latest
+
+    defaults:
+      run:
+        working-directory: ${{ inputs.working-directory }}
+
+    steps:
+
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+
+      - name: Install dependencies
+        run: npm install
+
+      - name: Run tests
+        run: npm test
