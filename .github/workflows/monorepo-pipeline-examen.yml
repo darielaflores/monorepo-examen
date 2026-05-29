@@ -1,0 +1,108 @@
+name: Monorepo Pipeline Examen
+
+on:
+  push:
+
+jobs:
+
+  detect-changes:
+
+    runs-on: ubuntu-latest
+
+    outputs:
+      frontend: ${{ steps.filter.outputs.frontend }}
+      backend: ${{ steps.filter.outputs.backend }}
+      infrastructure: ${{ steps.filter.outputs.infrastructure }}
+      docs: ${{ steps.filter.outputs.docs }}
+
+    steps:
+
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Detect changes
+        id: filter
+        uses: dorny/paths-filter@v3
+
+        with:
+          filters: |
+
+            frontend:
+              - 'frontend/**'
+
+            backend:
+              - 'backend/**'
+
+            infrastructure:
+              - 'infrastructure/**'
+
+            docs:
+              - 'docs/**'
+
+  frontend-job:
+
+    needs: detect-changes
+
+    if: needs.detect-changes.outputs.frontend == 'true'
+
+    uses: ./.github/workflows/reusable-node-examen.yml
+
+    with:
+      working-directory: frontend
+
+  backend-job:
+
+    needs: detect-changes
+
+    if: needs.detect-changes.outputs.backend == 'true'
+
+    uses: ./.github/workflows/reusable-node-examen.yml
+
+    with:
+      working-directory: backend
+
+  infrastructure-job:
+
+    needs: detect-changes
+
+    if: needs.detect-changes.outputs.infrastructure == 'true'
+
+    runs-on: ubuntu-latest
+
+    steps:
+
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Validate infrastructure
+        run: |
+          echo "Infrastructure pipeline executed"
+
+  reporting:
+
+    needs:
+      - detect-changes
+      - frontend-job
+      - backend-job
+      - infrastructure-job
+
+    if: always()
+
+    runs-on: ubuntu-latest
+
+    steps:
+
+      - name: Generate summary
+        run: |
+
+          echo "# Monorepo Report" >> $GITHUB_STEP_SUMMARY
+
+          echo "## Components affected" >> $GITHUB_STEP_SUMMARY
+
+          echo "- Frontend: ${{ needs.detect-changes.outputs.frontend }}" >> $GITHUB_STEP_SUMMARY
+
+          echo "- Backend: ${{ needs.detect-changes.outputs.backend }}" >> $GITHUB_STEP_SUMMARY
+
+          echo "- Infrastructure: ${{ needs.detect-changes.outputs.infrastructure }}" >> $GITHUB_STEP_SUMMARY
+
+          echo "- Docs: ${{ needs.detect-changes.outputs.docs }}" >> $GITHUB_STEP_SUMMARY
