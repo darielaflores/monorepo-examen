@@ -5,6 +5,16 @@ on:
     branches:
       - main
 
+  workflow_dispatch:
+    inputs:
+      action:
+        description: "Ejecutar self-hosted"
+        required: true
+        default: "self-hosted-job"
+        type: choice
+        options:
+          - self-hosted-job
+
 jobs:
 
   # Self runner
