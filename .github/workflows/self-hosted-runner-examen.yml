@@ -17,7 +17,7 @@ on:
 
 jobs:
 
-  # Self runner
+  # Self-hosted runner 
   self-hosted-job:
 
     runs-on:
